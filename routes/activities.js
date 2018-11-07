@@ -32,12 +32,12 @@ router.post('/new', function(req, res, next) {
             return res.status(401).json(responseJson);
          }
          else {
-            var snapshot = {date: Date(req.body.date),
+            var snapshot = {date: new Date(req.body.date),
                longitude: req.body.longitude,
                latitude: req.body.latitude,
                uvLevel: req.body.uvLevel
             };
-            Activity.findOne({email: device.email, activityId: req.body.activityId}, function (err, activity) {
+            Activity.findOne({userEmail: device.userEmail, activityId: req.body.activityId}, function (err, activity) {
                if (err) {
                   responseJson.success = false;
                   responseJson.message = "Error communicating with database.";
@@ -45,7 +45,7 @@ router.post('/new', function(req, res, next) {
                }
                else if (!activity) {
                   var newActivity = new Activity({
-                     userEmail: device.email,
+                     userEmail: device.userEmail,
                      activityId: req.body.activityId,
                      snapshots: [snapshot]
                   });
