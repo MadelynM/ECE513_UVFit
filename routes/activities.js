@@ -82,4 +82,40 @@ router.post('/new', function(req, res, next) {
    }
 });
 
+router.get('/retrieve/:actid', function(req, res, next) {
+   if (!req.headers["x-auth"]) {
+      return res.status(401).json({success: false, message: "No authentication token"});
+   }
+
+   var authToken = req.headers["x-auth"];
+
+   try {
+      var decodedToken = jwt.decode(authToken, secret);
+      var userStatus = {};
+
+      var activityId = req.params.actid;
+      if (activityId === "all") {
+         var query = {"userEmail": decodedToken.email};
+      }
+      else {
+         var query = {"userEmail": decodedToken.email, "activityId": activityId};
+      }
+
+      Activity.find(query, function(err, activities) {
+         if(err) {
+            return res.status(400).json({success: false, message: "Error looking up activity."});
+         }
+         else {
+            return res.status(200).json({success: true, activities: activities});
+         }
+      });
+   }
+   catch (ex) {
+      return res.status(401).json({success: false, message: "Invalid authentication token."});
+   }
+
+});
+
+
+
 module.exports = router;
