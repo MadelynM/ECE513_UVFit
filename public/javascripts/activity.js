@@ -13,6 +13,13 @@ function GetData(){
 
 }
 function requestSuccess(data, textSatus, jqXHR) {
+  var lineSymbol = {
+      path: google.maps.SymbolPath.CIRCLE,
+      fillOpacity: 5,
+      scale:4 ,
+      strokeColor:'red',
+      fillColor:'red'
+  };
 
  if(data.snapshots.length==0 ){
    $('#serverMessag').append("<li class='collection-item'>" +
@@ -26,7 +33,8 @@ function requestSuccess(data, textSatus, jqXHR) {
         if (snapshot.long != 0 && snapshot.lat !=0){
           marker = new google.maps.Marker({
 			        position: new google.maps.LatLng(snapshot.lat, (-1)*snapshot.long),
-			        map: map
+			        map: map,
+              icon:lineSymbol
 		            });
 
               }
@@ -57,6 +65,13 @@ $('#serverMessag').append("<li class='collection-item'>" +
 // Executes once the google map api is loaded, and then sets up the handler's and calls
 // getRecentPotholes() to display the recent potholes
 function initMap() {
+  var lineSymbol = {
+      path: google.maps.SymbolPath.CIRCLE,
+      fillOpacity: 5,
+      scale:4 ,
+      strokeColor:'red',
+      fillColor:'red'
+  };
 
   document.getElementById("main").style.display = "block";
    // Allow the user to refresh by clicking a button.
@@ -65,7 +80,6 @@ function initMap() {
      center: {lat: 32.2319, lng: -110.9501}
    }
  map= new google.maps.Map(document.getElementById('map'),options);
-
 
 GetData();
 
