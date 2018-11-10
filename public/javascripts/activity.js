@@ -20,15 +20,16 @@ function requestSuccess(data, textSatus, jqXHR) {
       strokeColor:'red',
       fillColor:'red'
   };
-
+// <ul id="serverMessag"></ul>
  if(data.snapshots.length==0 ){
-   $('#serverMessag').append("<li class='collection-item'>" +
-     data.message + "</li>");
+   $('#serverRes').html("<p class='collection-item'>" +
+     data.message + "</p>");
  }
  else{
+     var dataStr= "<ul>" ;
    for (var snapshot of data.snapshots) {
-      $("#serverMessag").append("<li class='collection-item'>lat: " +
-        snapshot.lat + ", long: " + snapshot.long + ", uvLevel: "+ snapshot.uvVal+"</li>")
+     dataStr = dataStr + "<ul>" + "<li class='collection-item'>lat: " +
+  snapshot.lat + ", long: " + snapshot.long + ", uvLevel: "+ snapshot.uvVal+"</li>";
 
         if (snapshot.long != 0 && snapshot.lat !=0){
           marker = new google.maps.Marker({
@@ -36,9 +37,12 @@ function requestSuccess(data, textSatus, jqXHR) {
 			        map: map,
               icon:lineSymbol
 		            });
-
               }
             }
+        dataStr = dataStr + "</ul>"
+
+  $("#serverRes").html(dataStr);
+
           }
 
   }
@@ -81,11 +85,16 @@ function initMap() {
    }
  map= new google.maps.Map(document.getElementById('map'),options);
 
-GetData();
+  GetData();
+
 
   //  document.getElementById("refresh").addEventListener("click", getRecentPotholes);
-
 }
+
+setInterval(function(){
+  GetData();
+}, 1000);
+
 
 // Handle authentication on page load
 $(function() {
