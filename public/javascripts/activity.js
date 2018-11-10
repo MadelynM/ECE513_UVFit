@@ -18,12 +18,22 @@ function requestSuccess(data, textSatus, jqXHR) {
    $('#serverMessag').append("<li class='collection-item'>" +
      data.message + "</li>");
  }
+ else{
    for (var snapshot of data.snapshots) {
       $("#serverMessag").append("<li class='collection-item'>lat: " +
         snapshot.lat + ", long: " + snapshot.long + ", uvLevel: "+ snapshot.uvVal+"</li>")
-    }
 
-}
+        if (snapshot.long != 0 && snapshot.lat !=0){
+          marker = new google.maps.Marker({
+			        position: new google.maps.LatLng(snapshot.lat, snapshot.long),
+			        map: map
+		            });
+
+              }
+            }
+          }
+
+  }
 
 function errorHandling(jqXHR, textStatus, errorThrown) {
    // If authentication error, delete the authToken
@@ -48,18 +58,14 @@ $('#serverMessag').append("<li class='collection-item'>" +
 // getRecentPotholes() to display the recent potholes
 function initMap() {
 
-   document.getElementById("main").style.display = "block";
-    // Allow the user to refresh by clicking a button.
-    var options={
-      zoom:13,
-      center: {lat: 32.2319, lng: -110.9501}
-    }
-    var map= new google.maps.Map(document.getElementById('map'),options);
+  document.getElementById("main").style.display = "block";
+   // Allow the user to refresh by clicking a button.
+   var options={
+     zoom:13,
+     center: {lat: 32.2319, lng: -110.9501}
+   }
+ map= new google.maps.Map(document.getElementById('map'),options);
 
-    var marker = new google.maps.Marker({
-              position:{lat: 32.2319, lng: -110.9501},
-              map: map
-            });
 
 GetData();
 
