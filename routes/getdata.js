@@ -57,7 +57,8 @@ var dtoken = authenticateAuthToken(req);
               var data={
                 lat:snapshot.latitude,
                 long:snapshot.longitude,
-                uvVal:snapshot.uvLevel
+                uvVal:snapshot.uvLevel,
+                speed: snapshot.speed
               };
               responseJson.snapshots.push(data);
             }

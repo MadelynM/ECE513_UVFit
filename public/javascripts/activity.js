@@ -29,7 +29,7 @@ function requestSuccess(data, textSatus, jqXHR) {
      var dataStr= "<ul>" ;
    for (var snapshot of data.snapshots) {
      dataStr = dataStr + "<ul>" + "<li class='collection-item'>lat: " +
-  snapshot.lat + ", long: " + snapshot.long + ", uvLevel: "+ snapshot.uvVal+"</li>";
+  snapshot.lat + ", long: " + snapshot.long + ", uvLevel: "+ snapshot.uvVal+", speed: " + snapshot.speed "</li>";
 
         if (snapshot.long != 0 && snapshot.lat !=0){
           marker = new google.maps.Marker({
