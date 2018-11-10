@@ -1,13 +1,58 @@
 var map = null;
 
+function GetData(){
+
+  $.ajax({
+     url: '/getdata/data',
+     type: 'GET',
+     headers: { 'x-auth': window.localStorage.getItem("authToken") },
+     responseType: 'json',
+     success: requestSuccess,
+     error: errorHandling
+  });
+
+}
+function requestSuccess(data, textSatus, jqXHR) {
+
+ if(data.snapshots.length==0 ){
+   $('#serverMessag').append("<li class='collection-item'>" +
+     data.message + "</li>");
+ }
+   for (var snapshot of data.snapshots) {
+      $("#serverMessag").append("<li class='collection-item'>lat: " +
+        snapshot.lat + ", long: " + snapshot.long + ", uvLevel: "+ snapshot.uvVal+"</li>")
+    }
+
+}
+
+function errorHandling(jqXHR, textStatus, errorThrown) {
+   // If authentication error, delete the authToken
+   // redirect user to sign-in page (which is index.html)
+   if( jqXHR.status === 401 ) {
+      console.log("Invalid auth token");
+      window.localStorage.removeItem("authToken");
+     window.location.replace("index.html");
+   }
+   else {
+ var response = JSON.parse(jqXHR.responseText);
+$('#serverMessag').append("<li class='collection-item'>" +
+  response.message + "</li>");
+   }
+}
+
+
+
+
+
 // Executes once the google map api is loaded, and then sets up the handler's and calls
 // getRecentPotholes() to display the recent potholes
 function initMap() {
+
    document.getElementById("main").style.display = "block";
     // Allow the user to refresh by clicking a button.
     var options={
-      zoom:9,
-      center: {lat: 32.2226, lng: -110.9747}
+      zoom:13,
+      center: {lat: 32.2319, lng: -110.9501}
     }
     var map= new google.maps.Map(document.getElementById('map'),options);
 
@@ -15,6 +60,8 @@ function initMap() {
               position:{lat: 32.2319, lng: -110.9501},
               map: map
             });
+
+GetData();
 
   //  document.getElementById("refresh").addEventListener("click", getRecentPotholes);
 

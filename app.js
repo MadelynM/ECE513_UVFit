@@ -10,11 +10,11 @@ var bodyParser = require('body-parser');
 var usersRouter = require('./routes/users');
 //var shippingRouter = require('./routes/shipping');
 var devicesRouter = require('./routes/devices');
-//var photonRouter = require('./routes/photon');
+var getdataRouter = require('./routes/getdata');
 var activitiesRouter = require('./routes/activities');
 
-// Creates the router for the currency router. 
-// The './routes/currency' tells express use the module defined 
+// Creates the router for the currency router.
+// The './routes/currency' tells express use the module defined
 // in the currency.js file located in the routes directory
 //var currencyRouter = require('./routes/currency');
 
@@ -80,7 +80,7 @@ app.use('/users', usersRouter);
 //app.use('/currency', currencyRouter);
 //app.use('/shipping', shippingRouter);
 app.use('/devices', devicesRouter);
-//app.use('/photon', photonRouter);
+app.use('/getdata', getdataRouter);
 app.use('/activities', activitiesRouter);
 
 // catch 404 and forward to error handler
