@@ -13,8 +13,8 @@ var secret = "supersecretserverpassword";
 
 router.post('/new', function(req, res, next) {
    var responseJson = {success: true, message: ""};
-   if (!req.body.date || !req.body.activityId || !req.body.longitude ||
-       !req.body.latitude || !req.body.uvLevel) {
+   if (!req.body.date || !req.body.activityId || !req.body.latitude ||
+       !req.body.longitude || !req.body.uvLevel || !req.body.speed) {
       responseJson.success = false;
       responseJson.message = "Invalid request";
       return res.status(400).json(responseJson);
@@ -33,8 +33,9 @@ router.post('/new', function(req, res, next) {
          }
          else {
             var snapshot = {date: new Date(req.body.date),
-               longitude: req.body.longitude,
                latitude: req.body.latitude,
+               longitude: req.body.longitude,
+               speed: req.body.speed,
                uvLevel: req.body.uvLevel
             };
             Activity.findOne({userEmail: device.userEmail, activityId: req.body.activityId}, function (err, activity) {
