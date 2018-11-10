@@ -33,7 +33,7 @@ function requestSuccess(data, textSatus, jqXHR) {
 
         if (snapshot.long != 0 && snapshot.lat !=0){
           marker = new google.maps.Marker({
-			        position: new google.maps.LatLng(snapshot.lat, (-1)*snapshot.long),
+			        position: new google.maps.LatLng(snapshot.lat, snapshot.long),
 			        map: map,
               icon:lineSymbol
 		            });
