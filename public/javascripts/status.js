@@ -14,7 +14,7 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
    $("#fullName").html(data.fullName);
    $("#lastAccess").html(data.lastAccess);
    $("#main").show();
-   
+
    // Add the devices to the list before the list item for the add device button (link)
    for (var device of data.devices) {
       $("#addDeviceForm").before("<li class='collection-item'>ID: " +
@@ -24,17 +24,17 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
 }
 
 function accountInfoError(jqXHR, textStatus, errorThrown) {
-   // If authentication error, delete the authToken 
+   // If authentication error, delete the authToken
    // redirect user to sign-in page (which is index.html)
    if( jqXHR.status === 401 ) {
       console.log("Invalid auth token");
       window.localStorage.removeItem("authToken");
       window.location.replace("index.html");
-   } 
+   }
    else {
      $("#error").html("Error: " + status.message);
      $("#error").show();
-   } 
+   }
 }
 
 // Registers the specified device with the server.
@@ -44,7 +44,7 @@ function registerDevice() {
         url: '/devices/register',
         type: 'POST',
         //contentType: "application/json",
-        headers: { 'x-auth': window.localStorage.getItem("authToken") },   
+        headers: { 'x-auth': window.localStorage.getItem("authToken") },
         data: { deviceId: $("#deviceId").val() }, //, email: $("#email").text()
         responseType: 'json',
         success: function (data, textStatus, jqXHR) {
@@ -52,7 +52,7 @@ function registerDevice() {
            $("#addDeviceForm").before("<li class='collection-item'>ID: " +
            $("#deviceId").val() + ", APIKEY: " + data["apikey"] + "</li>")
            hideAddDeviceForm();
-           $("#addDeviceForm").before("<div id='test'>"+ data["message"]+"</div>");
+           $("#error").before("<div id='test'>"+ data["message"]+"</div>");
            $("#test").fadeOut(5000);
            console.log(data);
         },
@@ -62,8 +62,8 @@ function registerDevice() {
             $("#error").html("Error: " + response.message);
             $("#error").show();
         }
-    }); 
-   
+    });
+
 }
 
 // Show add device form and hide the add device button (really a link)
@@ -82,7 +82,7 @@ function hideAddDeviceForm() {
 
 // Handle authentication on page load
 $(function() {
-   // If there's no authToekn stored, redirect user to 
+   // If there's no authToekn stored, redirect user to
    // the sign-in page (which is index.html)
    if (!window.localStorage.getItem("authToken")) {
       window.location.replace("index.html");
@@ -90,9 +90,9 @@ $(function() {
    else {
       sendReqForAccountInfo();
    }
-   
+
    // Register event listeners
    $("#addDevice").click(showAddDeviceForm);
-   $("#registerDevice").click(registerDevice);   
-   $("#cancel").click(hideAddDeviceForm);   
+   $("#registerDevice").click(registerDevice);
+   $("#cancel").click(hideAddDeviceForm);
 });

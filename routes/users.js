@@ -16,7 +16,7 @@ router.post('/signin', function(req, res, next) {
          res.status(401).json({success : false, error : "Error communicating with database."});
       }
       else if(!user) {
-         res.status(401).json({success : false, error : "The email or password provided was invalid."});         
+         res.status(401).json({success : false, error : "The email or password provided was invalid."});
       }
       else {
          bcrypt.compare(req.body.password, user.passwordHash, function(err, valid) {
@@ -25,10 +25,10 @@ router.post('/signin', function(req, res, next) {
             }
             else if(valid) {
                var token = jwt.encode({email: req.body.email}, secret);
-               res.status(201).json({success : true, token : token});         
+               res.status(201).json({success : true, token : token});
             }
             else {
-               res.status(401).json({success : false, error : "The email or password provided was invalid."});         
+               res.status(401).json({success : false, error : "The email or password provided was invalid."});
             }
          });
       }
@@ -45,8 +45,8 @@ router.post('/register', function(req, res, next) {
            email: req.body.email,
            fullName: req.body.fullName,
            passwordHash: hash // hashed password
-        }); 
-        
+        });
+
         newUser.save( function(err, user) {
            if (err) {
               // Error can occur if a duplicate email is sent
@@ -64,13 +64,13 @@ router.get("/account" , function(req, res) {
    if (!req.headers["x-auth"]) {
       return res.status(401).json({success: false, message: "No authentication token"});
    }
-   
+
    var authToken = req.headers["x-auth"];
-   
+
    try {
       var decodedToken = jwt.decode(authToken, secret);
       var userStatus = {};
-      
+
       User.findOne({email: decodedToken.email}, function(err, user) {
          if(err) {
             return res.status(200).json({success: false, message: "User does not exist."});
@@ -80,22 +80,22 @@ router.get("/account" , function(req, res) {
             userStatus['email'] = user.email;
             userStatus['fullName'] = user.fullName;
             userStatus['lastAccess'] = user.lastAccess;
-            
+
             // Find devices based on decoded token
           Device.find({ userEmail : decodedToken.email}, function(err, devices) {
             if (!err) {
                // Construct device list
-               var deviceList = []; 
+               var deviceList = [];
                for (device of devices) {
-                 deviceList.push({ 
+                 deviceList.push({
                        deviceId: device.deviceId,
                        apikey: device.apikey,
                  });
                }
                userStatus['devices'] = deviceList;
             }
-            
-               return res.status(200).json(userStatus);            
+
+               return res.status(200).json(userStatus);
           });
          }
       });
@@ -103,7 +103,7 @@ router.get("/account" , function(req, res) {
    catch (ex) {
       return res.status(401).json({success: false, message: "Invalid authentication token."});
    }
-   
+
 });
 
 module.exports = router;

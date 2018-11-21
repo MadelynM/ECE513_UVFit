@@ -11,6 +11,7 @@ var usersRouter = require('./routes/users');
 //var shippingRouter = require('./routes/shipping');
 var devicesRouter = require('./routes/devices');
 var getdataRouter = require('./routes/getdata');
+var updateInfoRouter = require('./routes/updateinfo');
 var activitiesRouter = require('./routes/activities');
 
 // Creates the router for the currency router.
@@ -81,6 +82,7 @@ app.use('/users', usersRouter);
 //app.use('/shipping', shippingRouter);
 app.use('/devices', devicesRouter);
 app.use('/getdata', getdataRouter);
+app.use('/updateinfo', updateInfoRouter);
 app.use('/activities', activitiesRouter);
 
 // catch 404 and forward to error handler
