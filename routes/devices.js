@@ -11,7 +11,7 @@ var secret = "supersecretserverpassword";
 function getNewApikey() {
     var newApikey = "";
     var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    
+
     for (var i = 0; i < 32; i++) {
        newApikey += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
     }
@@ -32,7 +32,7 @@ router.get('/status/:devid', function(req, res, next) {
           "deviceId" : deviceId
       };
     }
-    
+
     Device.find(query, function(err, allDevices) {
       if (err) {
         var errorMsg = {"message" : err};
@@ -56,7 +56,7 @@ router.post('/register', function(req, res, next) {
         apikey : "none"
     };
     var deviceExists = false;
-    
+
     // Ensure the request includes the deviceId parameter
     if(!("deviceId" in req.body)) {  //!req.body.hasOwnProperty("deviceId")
         responseJson.message = "Missing deviceId.";
@@ -64,8 +64,8 @@ router.post('/register', function(req, res, next) {
     }
 
     var email = "";
-    
-    // If authToken provided, use email in authToken 
+
+    // If authToken provided, use email in authToken
     if (req.headers["x-auth"]) {
         try {
             var decodedToken = jwt.decode(req.headers["x-auth"], secret);
@@ -84,7 +84,7 @@ router.post('/register', function(req, res, next) {
         }
         email = req.body.email;
     }
-    
+
     // See if device is already registered
     Device.findOne({ deviceId: req.body.deviceId }, function(err, device) {
         if (device !== null) {
@@ -94,7 +94,7 @@ router.post('/register', function(req, res, next) {
         else {
             // Get a new apikey
              deviceApikey = getNewApikey();
-             
+
              // Create a new device with specified id, user email, and randomly generated apikey.
             var newDevice = new Device({
                 deviceId: req.body.deviceId,
@@ -122,5 +122,76 @@ router.post('/register', function(req, res, next) {
     });
 });
 
+
+
+router.put('/replace', function(req, res, next) {
+    var responseJson = {
+        replaced: false,
+        message : "",
+        apikey : "none",
+    };
+
+
+    var email = "";
+  // If authToken provided, use email in authToken
+    if (req.headers["x-auth"]) {
+        try {
+            var decodedToken = jwt.decode(req.headers["x-auth"], secret);
+            email = decodedToken.email;
+        }
+        catch (ex) {
+            responseJson.message = "Invalid authorization token.";
+            return res.status(400).json(responseJson);
+        }
+    }
+    else {
+            responseJson.message = "Invalid authorization token.";
+            return res.status(400).json(responseJson);
+
+    }
+     deviceApikey = getNewApikey();
+
+
+   Device.findOne({ deviceId: req.body.deviceNew }, function(err, device) {
+         if (device !== null) {
+             responseJson.message = "Device ID " + req.body.deviceNew + " already registered.";
+             return res.status(400).json(responseJson);
+         }
+         else {
+
+    Device.update({userEmail:email, deviceId: req.body.deviceOld},
+       { deviceId: req.body.deviceNew , apikey:deviceApikey },
+       { multi: false },
+       function(err, sta) {
+         if (err){
+           responseJson.message = "Error communicating with database.";
+            res.status(401).json(responseJson);
+            return;
+         }
+         else if (!sta){
+           responseJson.message = "The email or password provided was invalid.";
+            res.status(401).json(responseJson);
+            return;
+         }
+         else {
+              if (sta.nModified != 0){
+           responseJson.replaced = true;
+           responseJson.apikey = deviceApikey;
+           responseJson.message = "Device with ID " + req.body.deviceOld + " has been replaced with new device.";
+           return res.status(201).json(responseJson);
+         }
+         else {
+           responseJson.message = "Device with ID " + req.body.deviceOld + " does not exist.";
+            res.status(401).json(responseJson);
+            return;
+         }
+        //  console.log("Documents updated: " + status.nModified);
+           }
+       });
+     }
+});
+
+    });
+
+
 module.exports = router;
-    

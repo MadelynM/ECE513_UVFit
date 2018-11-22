@@ -47,6 +47,16 @@ if (dtoken==null){
          return res.status(401).json(responseJson);
       }
 
+
+
+  User.findOne({ email: req.body.newEmail  }, function(err, user) {
+            if (user !== null) {
+                responseJson.message = "Email entered is already registered.";
+                return res.status(400).json(responseJson);
+            }
+            else {
+
+
    Device.update({userEmail: dtoken.email },
       { userEmail: req.body.newEmail },
       { multi: true },
@@ -86,7 +96,7 @@ if (dtoken==null){
                              }
                              else if (!sta){
                                res.status(401).json({success : false, message : "The email or password provided was invalid."});
-                               return
+                               return;
                              }
                              else {
                              var token = jwt.encode({email: req.body.newEmail}, secret);
@@ -99,6 +109,9 @@ if (dtoken==null){
                   });
               }
          });
+
+       }
+        });
      });
 
 router.post("/name", function(req, res) {
