@@ -33,3 +33,7 @@ top:7px;
   font-size: 16;
   text-align: center;
 }
+
+#day1 ,#day2 ,#day3, #des1, #des2, #des3 {
+    font-weight: bold;
+}
