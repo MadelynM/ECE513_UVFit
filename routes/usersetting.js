@@ -33,7 +33,7 @@ router.post('/setting', function(req, res, next) {
 
     request({
        method: "POST",
-       uri: "https://api.particle.io/v1/devices/" + req.body.deviceId + "/settingDevice",
+       uri: "https://api.particle.io/v1/devices/" + req.body.deviceId + "/settingDev",
        form: {
 	       access_token : particleAccessToken,
 	       args: "" +req.body.uvThreshold+" " +req.body.activity
