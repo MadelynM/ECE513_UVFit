@@ -157,9 +157,61 @@ function hideReplaceDeviceForm() {
    $("#error").hide();
 }
 
+function userSetting(){
+  var pass1=/[a-z]+/;
+  var pass2=/[A-Z]+/;
+  var pass3=/[0-9]+/;
+  $("#error9").hide();
+  var $devId=$("#deviceId2").val();
+
+  if (!pass1.test($devId) && !pass2.test($devId) && !pass3.test($devId)){
+    $("#error9").html("Error: " + "Invalide device Id.");
+          $("#error9").show();
+          return;
+  }
+var $uvThreshold=$("#UVlimit").val();
+
+  if (!$.isNumeric($uvThreshold)){
+  $("#error9").html("Error: " + "uvThreshold.");
+        $("#error9").show();
+        return;
+}
+
+var selected_option = $('#selectedTest option:selected').text();
+if (selected_option == "Choose activity type"){
+  $("#error9").html("Error: " + "Choose activity type.");
+        $("#error9").show();
+        return;
+}
+console.log(selected_option);
+  $.ajax({
+      url: '/usersetting/setting',
+      type: 'POST',
+      //contentType: "application/json",
+      headers: { 'x-auth': window.localStorage.getItem("authToken") },
+      data: { deviceId: $devId, uvThreshold: $uvThreshold, activity:selected_option },
+      responseType: 'json',
+      success: function (data, textStatus, jqXHR) {
+  $("#message").html("settings updated");
+    $("#message").show();
+         console.log(data);
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+         var response = JSON.parse(jqXHR.responseText);
+         //console.log(jqXHR);
+          console.log(response);
+          $("#error9").html("Error: " + response.message);
+          $("#error9").show();
+      }
+  });
+
+
+}
+
 
 // Handle authentication on page load
 $(function() {
+
    // If there's no authToekn stored, redirect user to
    // the sign-in page (which is index.html)
    if (!window.localStorage.getItem("authToken")) {
@@ -168,7 +220,7 @@ $(function() {
    else {
       sendReqForAccountInfo();
    }
-
+  $("#UVbtn").click(userSetting);
    // Register event listeners
    $("#addDevice").click(showAddDeviceForm);
    $("#registerDevice").click(registerDevice);
