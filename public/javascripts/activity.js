@@ -1,18 +1,126 @@
 var map = null;
+var markers = [];
 
-function GetData(){
+function clearMarkers() {
+  for (var i = 0; i < markers.length; i++ ) {
+    markers[i].setMap(null);
+  }
+  markers.length = 0;
+}
 
+function reduceActivity(activity) {
+  // Number of calories burned in 1s per activity at given speed
+  // Given values are meaningless nonsense
+  var calPerOne = {
+    walking: 5,
+    running: 10,
+    swimming: 12
+  };
+
+  var result = {
+    duration: 0,
+    burned: 0,
+    uvTotal: 0
+  };
+
+  var activityType = activity.activityType;
+  var startDate = new Date(activity.startDate);
+  var endDate = new Date(activity.endDate);
+  result.duration = (endDate.getTime() - startDate.getTime());
+
+  if (!activityType) {
+    activityType = "walking";
+  }
+
+  for (var key in activity.snapshots) {
+    result.burned += calPerOne[activityType]*activity.snapshots[key].speed;
+    result.uvTotal += activity.snapshots[key].uvLevel;
+  }
+
+  return result;
+}
+
+function getMyWeeklySummary(){
   $.ajax({
-     url: '/getdata/data',
+     url: '/activities/retrieve/week',
      type: 'GET',
      headers: { 'x-auth': window.localStorage.getItem("authToken") },
      responseType: 'json',
-     success: requestSuccess,
+     success: myWeeklySummarySuccess,
      error: errorHandling
   });
-
 }
-function requestSuccess(data, textSatus, jqXHR) {
+
+function myWeeklySummarySuccess(data, textStatus, jqXHR) {
+  var responseHTML = "";
+  if (!data.activities) {
+    responseHTML += "<p class='collection-item'>" + data.message + "</p>";
+  }
+  else {
+    var activityDuration = 0;
+    var caloriesBurned = 0;
+    var uvTotal = 0;
+    for (var key in data.activities) {
+      var curActivity = data.activities[key];
+      result = reduceActivity(curActivity);
+      activityDuration += result.duration;
+      caloriesBurned += result.burned;
+      uvTotal += result.uvTotal;
+    }
+    responseHTML += "<ul>";
+    responseHTML += "<li>Activity Duration (s): " + Math.round(activityDuration/1000.0) + "</li>";
+    responseHTML += "<li>Calories Burned: " + Math.round(caloriesBurned) + "</li>";
+    responseHTML += "<li>Total UV Exposure: " + uvTotal + "</li>";
+    responseHTML += "</ul>";
+  }
+  $("#summaryDisplay").html(responseHTML);
+}
+
+function getMyActivitySummary(){
+  $.ajax({
+     url: '/activities/retrieve/all',
+     type: 'GET',
+     headers: { 'x-auth': window.localStorage.getItem("authToken") },
+     responseType: 'json',
+     success: myActivitySummarySuccess,
+     error: errorHandling
+  });
+}
+
+function myActivitySummarySuccess(data, textStatus, jqXHR) {
+  var responseHTML = "";
+  if (!data.activities) {
+    responseHTML += "<p class='collection-item'>" + data.message + "</p>";
+  }
+  else {
+    responseHTML += "<ul>";
+    for (var key in data.activities) {
+      var curActivity = data.activities[key];
+      responseHTML += "<a href='#' onclick=getOneActivity(" + curActivity.activityId + ")>";
+      responseHTML += "<li>Activity ID: " + curActivity.activityId + "</li>";
+      responseHTML += "</a>";
+      responseHTML += "<li>Activity started: " + curActivity.startDate + "</li>";
+      result = reduceActivity(curActivity);
+      responseHTML += "<li>Activity duration (s): " + Math.round(result.duration/1000.0) + "</li>";
+      responseHTML += "<li>Calories burned: " + Math.round(result.burned) + "</li>";
+    }
+    responseHTML += "</ul>";
+  }
+  $("#summaryDisplay").html(responseHTML);
+}
+
+function getOneActivity(actid){
+  $.ajax({
+     url: '/activities/retrieve/' + actid,
+     type: 'GET',
+     headers: { 'x-auth': window.localStorage.getItem("authToken") },
+     responseType: 'json',
+     success: activitySuccess,
+     error: errorHandling
+  });
+}
+
+function activitySuccess(data, textStatus, jqXHR) {
   var lineSymbol = {
       path: google.maps.SymbolPath.CIRCLE,
       fillOpacity: 5,
@@ -20,46 +128,47 @@ function requestSuccess(data, textSatus, jqXHR) {
       strokeColor:'red',
       fillColor:'red'
   };
-// <ul id="serverMessag"></ul>
- if(data.snapshots.length==0 ){
+
+  $("#map").css("display", "block");
+
+  if(data.activities[0].snapshots.length==0 ){
    $('#serverRes').html("<p class='collection-item'>" +
      data.message + "</p>");
- }
- else{
-     var dataStr= "<ul>" ;
-   for (var snapshot of data.snapshots) {
-     dataStr = dataStr + "<ul>" + "<li class='collection-item'>lat: " +
-  snapshot.lat + ", long: " + snapshot.long + ", uvLevel: "+ snapshot.uvVal+", speed: " + snapshot.speed + "</li>";
-
-        if (snapshot.long != 0 && snapshot.lat !=0){
-          marker = new google.maps.Marker({
-			        position: new google.maps.LatLng(snapshot.lat, snapshot.long),
-			        map: map,
-              icon:lineSymbol
-		            });
-              }
-            }
-        dataStr = dataStr + "</ul>"
-
-  $("#serverRes").html(dataStr);
-
-          }
-
   }
+  else{
+    var dataStr= "<ul>" ;
+    clearMarkers();
+    for (var snapshot of data.activities[0].snapshots) {
+      dataStr = dataStr + "<ul>" + "<li class='collection-item'>lat: " +
+      snapshot.latitude + ", long: " + snapshot.longitude + ", uvLevel: "+ snapshot.uvLevel+", speed: " + snapshot.speed + "</li>";
+
+      if (snapshot.longitude != 0 && snapshot.latitude !=0){
+        marker = new google.maps.Marker({
+          position: new google.maps.LatLng(snapshot.latitude, snapshot.longitude),
+          map: map, icon:lineSymbol
+        });
+        markers.push(marker);
+      }
+    }
+    dataStr = dataStr + "</ul>"
+
+    $("#serverRes").html(dataStr);
+  }
+}
 
 function errorHandling(jqXHR, textStatus, errorThrown) {
-   // If authentication error, delete the authToken
-   // redirect user to sign-in page (which is index.html)
-   if( jqXHR.status === 401 ) {
-      console.log("Invalid auth token");
-      window.localStorage.removeItem("authToken");
-     window.location.replace("index.html");
-   }
-   else {
- var response = JSON.parse(jqXHR.responseText);
-$('#serverMessag').append("<li class='collection-item'>" +
-  response.message + "</li>");
-   }
+  // If authentication error, delete the authToken
+  // redirect user to sign-in page (which is index.html)
+  if( jqXHR.status === 401 ) {
+    console.log("Invalid auth token");
+    window.localStorage.removeItem("authToken");
+    window.location.replace("index.html");
+  }
+  else {
+    var response = JSON.parse(jqXHR.responseText);
+    $('#serverMessage').append("<li class='collection-item'>" +
+      response.message + "</li>");
+  }
 }
 
 
@@ -70,37 +179,35 @@ $('#serverMessag').append("<li class='collection-item'>" +
 // getRecentPotholes() to display the recent potholes
 function initMap() {
   var lineSymbol = {
-      path: google.maps.SymbolPath.CIRCLE,
-      fillOpacity: 5,
-      scale:4 ,
-      strokeColor:'red',
-      fillColor:'red'
+    path: google.maps.SymbolPath.CIRCLE,
+    fillOpacity: 5,
+    scale:4 ,
+    strokeColor:'red',
+    fillColor:'red'
   };
 
-  document.getElementById("main").style.display = "block";
-   // Allow the user to refresh by clicking a button.
-   var options={
-     zoom:13,
-     center: {lat: 32.2319, lng: -110.9501}
-   }
- map= new google.maps.Map(document.getElementById('map'),options);
+  var options={
+    zoom:13,
+    center: {lat: 32.2319, lng: -110.9501}
+  };
+  map = new google.maps.Map(document.getElementById('map'),options);
 
-  GetData();
+  //GetData();
 
 
   //  document.getElementById("refresh").addEventListener("click", getRecentPotholes);
 }
 
-setInterval(function(){
-  GetData();
-}, 1000);
-
-
 // Handle authentication on page load
 $(function() {
-   // If there's no authToekn stored, redirect user to
-   // the sign-in page (which is index.html)
-   if (!window.localStorage.getItem("authToken")) {
-      window.location.replace("index.html");
-   }
+  // If there's no authToekn stored, redirect user to
+  // the sign-in page (which is index.html)
+  if (!window.localStorage.getItem("authToken")) {
+    window.location.replace("index.html");
+  }
+  else {
+    getMyWeeklySummary();
+    $("#mySummary").click(getMyWeeklySummary);
+    $("#myActivities").click(getMyActivitySummary);
+  }
 });

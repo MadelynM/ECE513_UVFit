@@ -3,6 +3,9 @@ var db = require("../db");
 var activitySchema = new db.Schema({
     userEmail:    String,
     activityId:   String,
+    startDate:    Date,
+    endDate:      Date,
+    activityType: String,
     snapshots:    [{
                       date : { type: Date, default: Date.now },
                       latitude : Number,

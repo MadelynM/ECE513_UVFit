@@ -32,7 +32,7 @@ router.post('/new', function(req, res, next) {
             return res.status(401).json(responseJson);
          }
          else {
-            var snapshot = {date: new Date(req.body.date),
+            var snapshot = {date: new Date(parseInt(req.body.date)),
                latitude: req.body.latitude,
                longitude: req.body.longitude,
                speed: req.body.speed,
@@ -48,6 +48,8 @@ router.post('/new', function(req, res, next) {
                   var newActivity = new Activity({
                      userEmail: device.userEmail,
                      activityId: req.body.activityId,
+                     startDate: req.body.date,
+                     endDate: req.body.date,
                      snapshots: [snapshot]
                   });
 
@@ -65,6 +67,12 @@ router.post('/new', function(req, res, next) {
                }
                else {
                   activity.snapshots.push(snapshot);
+                  if (activity.startDate > snapshot.date) {
+                    activity.startDate = snapshot.date;
+                  }
+                  if (activity.endDate < snapshot.date) {
+                    activity.endDate = snapshot.date;
+                  }
                   activity.save(function(err, newActivity) {
                      if (err) {
                         responseJson.success = false;
@@ -97,6 +105,11 @@ router.get('/retrieve/:actid', function(req, res, next) {
       var activityId = req.params.actid;
       if (activityId === "all") {
          var query = {"userEmail": decodedToken.email};
+      }
+      else if (activityId === "week") {
+         var dateNow = new Date();
+         var weekAgo = new Date(dateNow.getTime() - 1000*60*60*24*7);
+         var query = {"userEmail": decodedToken.email, "startDate": {"$gte": weekAgo}};
       }
       else {
          var query = {"userEmail": decodedToken.email, "activityId": activityId};

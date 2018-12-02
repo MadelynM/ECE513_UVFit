@@ -25,28 +25,36 @@
   <ul id="dropdown1" class="dropdown-content">
     <li><a href="home.html">Home</a></li>
     <li><a href="activity.html">Activity</a></li>
-  <li><a href="forecast.html">Weather and UV forecast</a></li>
+    <li><a href="forecast.html">Weather and UV forecast</a></li>
     <li><a href="#!" id="signout">Sign out</a></li>
   </ul>
   <nav>
     <div class="nav-wrapper blue-grey darken-2">
       <a href="home.html" class="brand-logo left"><img id="logo" src="images/uvlogo.png"><span id="name">UVFit</span></a>
-      <ul class="right ">
-          <!-- Dropdown Trigger -->
+      <ul class="right">
+         <li><a class="hide-on-med-and-down" href="home.html">Home</a></li>
+         <li><a class="hide-on-med-and-down" href="activity.html">Activity</a></li>
+         <li><a class="hide-on-med-and-down" href="forecast.html">Weather and UV forecast</a></li>
+         <!-- Dropdown Trigger -->
          <li><a class="dropdown-button" href="#!" data-activates="dropdown1"><i class="material-icons">more_vert</i></a></li>
       </ul>
     </div>
   </nav>
 
-  <div class="row" id="main" style="display: none;">
-    <div class="col s12 m12">
-      <div class="card blue-grey darken-2">
-        <div class="card-image" id="recentPotholes">
-          <a id="refresh" class="btn-floating halfway-fab waves-effect waves-light blue"><i class="material-icons">refresh</i></a>
-          <div id="map"></div>
-        </div>
-       <div id='serverRes' class="card-content white-text">
+  <div class="row" id="activity-nav">
+    <a class="btn" id="mySummary">My weekly summary</a>
+    <a class="btn" id="myActivities">My activities</a>
+  </div>
 
+  <div class="row" id="main">
+    <div class="col s12 m12">
+      <div id="summaryDisplay"></div>
+      <div class="card blue-grey darken-2">
+        <div class="card-image">
+          <a id="refresh" class="btn-floating halfway-fab waves-effect waves-light blue"><i class="material-icons">refresh</i></a>
+          <div id="map" style="display: none"></div>
+        </div>
+       <div id="serverRes" class="card-content white-text">
        </div>
      </div>
     </div>
