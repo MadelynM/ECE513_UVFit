@@ -10,6 +10,7 @@ function sendReqForAccountInfo() {
 }
 
 function accountInfoSuccess(data, textSatus, jqXHR) {
+  console.log(data);
    $("#email").html(data.email);
    $("#fullName").html(data.fullName);
    $("#lastAccess").html(data.lastAccess);
@@ -26,6 +27,7 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
 function accountInfoError(jqXHR, textStatus, errorThrown) {
    // If authentication error, delete the authToken
    // redirect user to sign-in page (which is index.html)
+     console.log(jqXHR);
    if( jqXHR.status === 401 ) {
       console.log("Invalid auth token");
       window.localStorage.removeItem("authToken");

@@ -5,7 +5,9 @@ var userSchema = new db.Schema({
   fullName:     { type: String, required: true },
   passwordHash: String,
   lastAccess:   { type: Date, default: Date.now },
-  userDevices:  [ String ]
+  userDevices:  [ String ],
+  active:  {type:Boolean, required: true, default: false },
+  tempToken: { type:String, required: true}
  // potholesHit:  [ { potholeId: Number, numHits: Number } ]
 });
 

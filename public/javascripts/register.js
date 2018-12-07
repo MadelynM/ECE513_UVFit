@@ -1,7 +1,7 @@
+var responseDiv = document.getElementById('ServerResponse');
 function sendReqForSignup() {
 
-var responseDiv = document.getElementById('ServerResponse');
-  // FIXME: More thorough validation should be performed here. 
+  // FIXME: More thorough validation should be performed here.
   //if (password != passwordConfirm) {
    // var responseDiv = document.getElementById('ServerResponse');
     //responseDiv.style.display = "block";
@@ -9,7 +9,7 @@ var responseDiv = document.getElementById('ServerResponse');
    // return;
  // }
   //*************************************************************************//
-  //Checking for a good password 
+  //Checking for a good password
 var fullNameIsValid=false;
 var emailIsValid=false;
 var passwordIsValid=false;
@@ -18,12 +18,12 @@ var passwordIsValid2=false;
 var passwordIsValid3=false;
 var passwordIsValid4=false;
 
-  var divFormErrors= document.getElementById("ServerResponse");
+  var divFormErrors= document.getElementById("Formate");
     var fullName=document.getElementById("fullName");
     var email=document.getElementById("email");
     var password=document.getElementById("password");
     var confirmPassword=document.getElementById("passwordConfirm");
-    
+
     if(document.getElementById("ul")==null){
         var ul=document.createElement("UL");
         ul.setAttribute("id", "ul");
@@ -36,8 +36,8 @@ var passwordIsValid4=false;
     var passwordRe=/[a-z]+/;
     var passwordRe2=/[A-Z]+/;
     var passwordRe3=/[0-9]+/;
-    
-  
+
+
   var removeNameError=document.getElementById("nameItem");
   var removeEmailError=document.getElementById("emailItem");
   var removePassLengthError=document.getElementById("passLenght");
@@ -45,7 +45,7 @@ var passwordIsValid4=false;
   var removePassError2=document.getElementById("passAtLeastOneChar2");
   var removePassError3=document.getElementById("passAtLeastOneDigit");
   var removePassError4=document.getElementById("confirm");
-  
+
     if(fullNameRe.test(fullName.value)){ //check if the full name is valide
         fullNameIsValid=true;
         fullName.classList.remove("error");
@@ -126,7 +126,7 @@ var passwordIsValid4=false;
         }
     }
     /*Password at least one uppercase char*/
-    
+
       if (passwordRe2.test(password.value)){
         password.classList.remove("error");
         passwordIsValid2=true;
@@ -189,13 +189,13 @@ var passwordIsValid4=false;
     if(fullNameIsValid==true &&  emailIsValid==true &&   passwordIsValid==true
     && passwordIsValid1==true && passwordIsValid2==true && passwordIsValid3==true && passwordIsValid4==true){
         divFormErrors.style.display="none";
-        
+
     }
     else {
        return;
     }
 
-  
+
 
   //*************************************************************************//
     var emailReq = document.getElementById("email").value;
@@ -212,30 +212,36 @@ var passwordIsValid4=false;
 }
 
 function signUpResponse() {
+    $('#ServerResponse').hide();
   // 200 is the response code for a successful GET request
   if (this.status === 201) {
     if (this.response.success) {
       // Change current location to the signin page.
-      window.location = "index.html";
-    } 
+      console.log(this.response.message);
+      $('#regForm').hide();
+      $('#ServerMessage').html(this.response.message);
+        $('#ServerMessage').show();
+    //  window.location = "index.html";
+    }
     else {
       responseHTML += "<ol class='ServerResponse'>";
       for (key in this.response) {
         responseHTML += "<li> " + key + ": " + this.response[key] + "</li>";
       }
       responseHTML += "</ol>";
+      responseDiv.style.display = "block";
+      responseDiv.innerHTML = responseHTML;
     }
   }
   else {
     // Use a span with dark red text for errors
-    responseHTML = "<span class='red-text text-darken-2'>";
-    responseHTML += "Error: " + this.response.error;
+    var responseHTML = "<span class='red-text text-darken-2'>";
+    responseHTML += "Error: " + this.response.message;
     responseHTML += "</span>"
+    responseDiv.style.display = "block";
+    responseDiv.innerHTML = responseHTML;
   }
 
-  // Update the response div in the webpage and make it visible
-  responseDiv.style.display = "block";
-  responseDiv.innerHTML = responseHTML;
 }
 
 document.addEventListener("DOMContentLoaded", function() {

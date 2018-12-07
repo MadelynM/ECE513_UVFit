@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>UVFit - Register</title>
- 
+
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
@@ -21,6 +21,7 @@
   </head>
 
   <body>
+    <main>
     <!-- Dropdown Structure -->
     <ul id="dropdown1" class="dropdown-content">
       <li><a href="index.html">Sign in</a></li>
@@ -38,7 +39,7 @@
     <div class="row">
       <div class="col s12 m6">
         <div class="card blue-grey ">
-          <div class="card-content white-text">
+          <div class="card-content white-text" id ="regForm">
             <span class="card-title">Account Registration</span>
             <div class="input-field">
               <label for="email">Email</label>
@@ -61,8 +62,36 @@
               <div id="account">Have an account? <a href="index.html">Sign In</a></div>
             </div>
           </div>
+          <div class="card-panel blue-text" id="Formate" style="display: none"></div>
+          <div class="card-panel" id="ServerMessage" style="display: none"></div>
           <div class="card-panel blue-text" id="ServerResponse" style="display: none"></div>
+
         </div>
       </div>
+    </main>
   </body>
+
+  <footer class="page-footer blue-grey darken-2">
+     <div class="container">
+       <div class="row">
+         <div class="col l6 s12">
+           <h5 class="white-text">UVFit Project</h5>
+           <p class="grey-text text-lighten-4">Copyright 2018
+           </p>
+         </div>
+         <div class="col l4 offset-l2 s12">
+           <h5 class="white-text">Links</h5>
+           <ul>
+             <li><a class="grey-text text-lighten-3" href="https://www.google.com/">Google</a></li>
+           </ul>
+         </div>
+       </div>
+     </div>
+     <div class="footer-copyright">
+       <div class="container">
+       © 2018 Copyright
+       </div>
+     </div>
+   </footer>
+
 </html>
