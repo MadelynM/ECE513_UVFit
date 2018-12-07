@@ -78,8 +78,8 @@ var token2 = jwt2.sign({email:req.body.email}, secret , { expiresIn: '1h' });
                from: 'UVFit staff, staff@uvfit.ga',
                to: req.body.email,
                subject: 'Activation Link',
-               text: 'Hello ' +req.body.fullName + ', thank you for registering at localhost.com. Please click on the following link to complete your activation: http://localhost:3000/users/activate/' + token2,
-               html: 'Hello<strong> ' + req.body.fullName + '</strong>,<br><br>Thank you for registering at uvfit.ga. Please click on the link below to complete your activation:<br><br><a href="http://localhost:3000/users/activate/' + token2 + '">https://uvfit.ga/activate/</a>'
+               text: 'Hello ' +req.body.fullName + ', thank you for registering at localhost.com. Please click on the following link to complete your activation: https://uvfit.ga/users/activate/' + token2,
+               html: 'Hello<strong> ' + req.body.fullName + '</strong>,<br><br>Thank you for registering at uvfit.ga. Please click on the link below to complete your activation:<br><br><a href="https://uvfit.ga/users/activate/' + token2 + '">https://uvfit.ga/activate/</a>'
              };
 
              client.sendMail(email, function(err, info){
