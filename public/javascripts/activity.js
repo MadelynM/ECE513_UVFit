@@ -67,13 +67,15 @@ function myWeeklySummarySuccess(data, textStatus, jqXHR) {
       caloriesBurned += result.burned;
       uvTotal += result.uvTotal;
     }
+    responseHTML += "<div class=\"col s12 m6\">";
     responseHTML += "<ul>";
     responseHTML += "<li>Activity Duration (s): " + Math.round(activityDuration/1000.0) + "</li>";
     responseHTML += "<li>Calories Burned: " + Math.round(caloriesBurned) + "</li>";
     responseHTML += "<li>Total UV Exposure: " + uvTotal + "</li>";
     responseHTML += "</ul>";
+    responseHTML += "</div>";
   }
-  $("#summaryDisplay").html(responseHTML);
+  $("#mySummaryRes").html(responseHTML);
 }
 
 function getMyActivitySummary(){
@@ -88,25 +90,86 @@ function getMyActivitySummary(){
 }
 
 function myActivitySummarySuccess(data, textStatus, jqXHR) {
-  var responseHTML = "";
+  var resHTML = "";
   if (!data.activities) {
-    responseHTML += "<p class='collection-item'>" + data.message + "</p>";
+    resHTML += "<p class='collection-item'>" + data.message + "</p>";
   }
   else {
-    responseHTML += "<ul>";
+    resHTML += "<div class=\"row\"><div class=\"col s12 m4\">";
     for (var key in data.activities) {
       var curActivity = data.activities[key];
-      responseHTML += "<a href='#' onclick=getOneActivity(" + curActivity.activityId + ")>";
-      responseHTML += "<li>Activity ID: " + curActivity.activityId + "</li>";
-      responseHTML += "</a>";
-      responseHTML += "<li>Activity started: " + curActivity.startDate + "</li>";
+      resHTML += "<ul class='collection'>";
+      resHTML += "<li class='collection-item'>";
+      resHTML += "<a href='#!' onclick=getOneActivity(";
+      resHTML += curActivity.activityId + ")>Activity ID: ";
+      resHTML += curActivity.activityId + "</a></li>";
+
+      resHTML += "<li class='collection-item'>Activity started: ";
+      resHTML += moment(curActivity.startDate).format('MMM Do YYYY, h:mm a') + "</li>";
+
+      var defaultHTML = "";
+      var actSel = {walking: "",
+        running: "",
+        biking: ""
+      };
+      switch(curActivity.activityType) {
+        case "walking":
+          actSel.walking = " selected"
+          break;
+        case "running":
+          actSel.running = " selected";
+          break;
+        case "biking":
+          actSel.biking = " selected";
+          break;
+        default:
+          defaultHTML += "<option value='' disabled selected>Choose activity type</option>";
+          break;
+      }
+      resHTML += "<li class='collection-item'>";
+      resHTML += "<div class='input-field'><select>";
+      resHTML += defaultHTML;
+      resHTML += "<option value='{\"activityType\": \"walking\", \"activityId\": \"";
+      resHTML += curActivity.activityId + "\"}'" + actSel.walking +">Walking</option>";
+      resHTML += "<option value='{\"activityType\": \"running\", \"activityId\": \"";
+      resHTML += curActivity.activityId + "\"}'" + actSel.running +">Running</option>";
+      resHTML += "<option value='{\"activityType\": \"biking\", \"activityId\": \"";
+      resHTML += curActivity.activityId + "\"}'" + actSel.biking +">Biking</option>";
+      resHTML += "</select><label>Type of Activity</label>";
+      resHTML += "</li>";
       result = reduceActivity(curActivity);
-      responseHTML += "<li>Activity duration (s): " + Math.round(result.duration/1000.0) + "</li>";
-      responseHTML += "<li>Calories burned: " + Math.round(result.burned) + "</li>";
+      resHTML += "<li class=\"collection-item\">Activity duration (s): " + Math.round(result.duration/1000.0) + "</li>";
+      resHTML += "<li class=\"collection-item\">Calories burned: " + Math.round(result.burned) + "</li>";
+      resHTML += "<li class=\"collection-item\">UV Exposure: " + Math.round(result.uvTotal) + "</li>";
+      resHTML += "</ul>";
     }
-    responseHTML += "</ul>";
+    resHTML += "</div></div>";
   }
-  $("#summaryDisplay").html(responseHTML);
+  $("#myActivitiesRes").html(resHTML);
+  $('select').material_select();
+  $('select').on('change', function() {
+    updateActivityType($(this).val());
+  });
+}
+
+function updateActivityType(jsonData){
+  console.log(jsonData);
+  $.ajax({
+     url: '/activities/update/type',
+     type: 'PUT',
+     headers: { 'x-auth': window.localStorage.getItem("authToken"),
+        'Content-Type': 'application/json'
+     },
+     data: jsonData,
+     responseType: 'json',
+     success: updateActivityTypeSuccess,
+     error: errorHandling
+  });
+}
+
+function updateActivityTypeSuccess(){
+    var resHTML = "Successfully updated the thing";
+    $("#responseMsg").html(resHTML);
 }
 
 function getOneActivity(actid){
@@ -129,7 +192,7 @@ function activitySuccess(data, textStatus, jqXHR) {
       fillColor:'red'
   };
 
-  $("#map").css("display", "block");
+  $("#oneActivity").css("display", "block");
 
   if(data.activities[0].snapshots.length==0 ){
    $('#serverRes').html("<p class='collection-item'>" +
@@ -139,8 +202,8 @@ function activitySuccess(data, textStatus, jqXHR) {
     var dataStr= "<ul>" ;
     clearMarkers();
     for (var snapshot of data.activities[0].snapshots) {
-      dataStr = dataStr + "<ul>" + "<li class='collection-item'>lat: " +
-      snapshot.latitude + ", long: " + snapshot.longitude + ", uvLevel: "+ snapshot.uvLevel+", speed: " + snapshot.speed + "</li>";
+//      dataStr = dataStr + "<ul>" + "<li class='collection-item'>lat: " +
+//      snapshot.latitude + ", long: " + snapshot.longitude + ", uvLevel: "+ snapshot.uvLevel+", speed: " + snapshot.speed + "</li>";
 
       if (snapshot.longitude != 0 && snapshot.latitude !=0){
         marker = new google.maps.Marker({
@@ -150,9 +213,9 @@ function activitySuccess(data, textStatus, jqXHR) {
         markers.push(marker);
       }
     }
-    dataStr = dataStr + "</ul>"
+//    dataStr = dataStr + "</ul>"
 
-    $("#serverRes").html(dataStr);
+//    $("#serverRes").html(dataStr);
   }
 }
 
@@ -166,8 +229,8 @@ function errorHandling(jqXHR, textStatus, errorThrown) {
   }
   else {
     var response = JSON.parse(jqXHR.responseText);
-    $('#serverMessage').append("<li class='collection-item'>" +
-      response.message + "</li>");
+    resHTML = response.message;
+    $('#errorMsg').resHTML(response.message);
   }
 }
 
@@ -207,7 +270,6 @@ $(function() {
   }
   else {
     getMyWeeklySummary();
-    $("#mySummary").click(getMyWeeklySummary);
-    $("#myActivities").click(getMyActivitySummary);
+    getMyActivitySummary();
   }
 });

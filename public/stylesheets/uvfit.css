@@ -48,3 +48,22 @@ main {
   flex: 1 0 auto;
 }
    
+.tabs .tab a{
+  color:#000;
+}
+
+.tabs .tab a:hover {
+  background-color:#eee;
+  color:#000;
+}
+
+.tabs .tab a.active {
+  background-color:#888;
+  color:#000;
+}
+
+.tabs .indicator {
+  background-color:#000;
+}
+
+

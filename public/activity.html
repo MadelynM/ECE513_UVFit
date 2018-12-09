@@ -4,16 +4,18 @@
   <meta charset="utf-8">
   <title>UVFit - Activities</title>
 
- <!-- Import Google Icon Font -->
- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
- <!-- Import materialize.css -->
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" media="screen,projection">
- <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-
+  <!-- Import Google Icon Font -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Import materialize.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" media="screen,projection">
   <link href="stylesheets/uvfit.css" rel="stylesheet">
-  <script src="/javascripts/signout.js" defer></script>
-  <script src="javascripts/activity.js"></script>
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+  <script defer type="text/javascript" src="javascripts/signout.js"></script>
+  <script defer type="text/javascript" src="javascripts/activity.js" defer></script>
+  <script type="text/javascript" src="http://momentjs.com/downloads/moment.min.js"></script>
+
   <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8U8V2hXlWiOvkmb0Cw_vJzx72SzE5A2M&callback=initMap"></script>
 
   <!--Let browser know website is optimized for mobile-->
@@ -42,26 +44,41 @@
     </div>
   </nav>
 
-  <div class="row" id="activity-nav">
-    <a class="btn" id="mySummary">My weekly summary</a>
-    <a class="btn" id="myActivities">My activities</a>
-  </div>
-
-  <div class="row" id="main">
-    <div class="col s12 m12">
-      <div id="summaryDisplay"></div>
-      <div class="card blue-grey darken-2">
-        <div class="card-image">
-          <a id="refresh" class="btn-floating halfway-fab waves-effect waves-light blue"><i class="material-icons">refresh</i></a>
-          <div id="map" style="display: none"></div>
-        </div>
-       <div id="serverRes" class="card-content white-text">
-       </div>
-     </div>
+  <div class="row">
+    <div class="col s12" id="responseMsg">
     </div>
   </div>
+
+  <div class="row">
+    <div class="col s12">
+      <ul class="tabs">
+        <li class="tab col s3"><a class="active" href="#mySummary">Weekly summary</a></li>
+        <li class="tab col s3"><a href="#myActivities">My activities</a></li>
+        <li class="tab col s3"><a href="#nearSummary">Nearby users</a></li>
+        <li class="tab col s3"><a href="#allSummary">All users</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="mySummary" class="row">
+    <div id="mySummaryRes" class="col s12 m12"></div>
+  </div>
+  <div id="myActivities" class="row">
+    <div id="oneActivity" class="col s12 m12" style="display:none">
+      <div class="card blue-grey darken-2">
+        <div class="card-image">
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+    
+  <div id="myActivitiesRes" class="col s12 m12"></div>
+  </div>
+
+  <div id="serverMessage"></div>
+
 </main>
-</body>
+
 <footer class="page-footer blue-grey darken-2">
    <div class="container">
      <div class="row">
@@ -83,11 +100,14 @@
      © 2018 Copyright
      </div>
    </div>
- </footer>
+</footer>
+
+</body>
 <!-- Initialize dropdown menu in materialize -->
 <script>
-  $(document).ready(function() {
+$(document).ready(function() {
   $(".dropdown-button").dropdown();
- })
+  $(".tabs").tabs();
+});
 </script>
 </html>

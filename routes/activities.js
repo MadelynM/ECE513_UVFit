@@ -50,6 +50,10 @@ router.post('/new', function(req, res, next) {
                      activityId: req.body.activityId,
                      startDate: req.body.date,
                      endDate: req.body.date,
+                     startLoc: {
+                        type: "Point",
+                        loc: [req.body.longitude, req.body.latitude]
+                     },
                      snapshots: [snapshot]
                   });
 
@@ -109,7 +113,10 @@ router.get('/retrieve/:actid', function(req, res, next) {
       else if (activityId === "week") {
          var dateNow = new Date();
          var weekAgo = new Date(dateNow.getTime() - 1000*60*60*24*7);
-         var query = {"userEmail": decodedToken.email, "startDate": {"$gte": weekAgo}};
+         var query = {
+           "userEmail": decodedToken.email,
+           "startDate": {"$gte": weekAgo}
+         };
       }
       else {
          var query = {"userEmail": decodedToken.email, "activityId": activityId};
@@ -130,6 +137,55 @@ router.get('/retrieve/:actid', function(req, res, next) {
 
 });
 
+router.put('/update/type', function(req, res, next) {
+   var responseJson = {success: true, message: ""};
+   if (!req.headers["x-auth"]) {
+      responseJson.success = false;
+      responseJson.message = "Invalid authentication token";
+      return res.status(401).json(responseJson);
+   }
+   if (!req.body.activityId || !req.body.activityType) {
+      responseJson.success = false;
+      responseJson.message = "Invalid request";
+      return res.status(400).json(responseJson);
+   }
 
+   var authToken = req.headers["x-auth"];
+
+   try {
+      var decodedToken = jwt.decode(authToken, secret);
+      var userStatus = {};
+
+      var activityId = req.body.activityId;
+      var query = {"userEmail": decodedToken.email,
+         "activityId": activityId
+      };
+      Activity.findOne(query, function(err, activity) {
+         if(err) {
+            responseJson.success = false;
+            responseJson.message = "Error looking up activity.";
+            return res.status(500).json(responseJson);
+         }
+         else {
+            activity.activityType = req.body.activityType;
+            activity.save(function(err) {
+               if (err) {
+                  responseJson.success = false;
+                  responseJson.message = err;
+                  return res.status(400).json(responseJson);
+               }
+               else {
+                  responseJson.message = "Activity with ID " + req.body.activityId + " was updated.";
+                  return res.status(200).json(responseJson);
+               }
+            });
+         }
+      });
+
+   }
+   catch(ex) {
+      return res.status(401).json({success: false, message: "Invalid authentication token."});
+   }
+});
 
 module.exports = router;
