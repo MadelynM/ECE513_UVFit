@@ -52,7 +52,7 @@ router.post('/new', function(req, res, next) {
                      endDate: req.body.date,
                      startLoc: {
                         type: "Point",
-                        loc: [req.body.longitude, req.body.latitude]
+                        coordinates: [req.body.longitude, req.body.latitude]
                      },
                      snapshots: [snapshot]
                   });
@@ -111,11 +111,11 @@ router.get('/retrieve/:actid', function(req, res, next) {
          var query = {"userEmail": decodedToken.email};
       }
       else if (activityId === "week") {
-         var dateNow = new Date();
-         var weekAgo = new Date(dateNow.getTime() - 1000*60*60*24*7);
+//         var dateNow = new Date();
+//         var weekAgo = new Date(dateNow.getTime() - 1000*60*60*24*7);
          var query = {
            "userEmail": decodedToken.email,
-           "startDate": {"$gte": weekAgo}
+           "startDate": {"$gte": weekAgo()}
          };
       }
       else {
@@ -186,6 +186,187 @@ router.put('/update/type', function(req, res, next) {
    catch(ex) {
       return res.status(401).json({success: false, message: "Invalid authentication token."});
    }
+});
+
+// Spherical distance, from stackoverflow
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180)
+}
+
+function sphereDist(lat1,lon1,lat2,lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2-lat1);  // deg2rad below
+  var dLon = deg2rad(lon2-lon1); 
+  var a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+    ; 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var d = R * c; // Distance in km
+  return d;
+}
+
+function reduceActivity(activity) {
+  // Number of calories burned in 1s per activity at given speed
+  // Given values are kind of okay
+  var calPerOne = {
+    walking: 0.031966,
+    running: 0.031966,
+    biking: 0.016942
+  };
+
+  var result = {
+    duration: 0,
+    burned: 0,
+    uvTotal: 0,
+    distance: 0
+  };
+
+  var activityType = activity.activityType;
+  var startDate = new Date(activity.startDate);
+  var endDate = new Date(activity.endDate);
+  result.duration = (endDate.getTime() - startDate.getTime());
+
+  if (!activityType) {
+    activityType = "walking";
+  }
+
+  var lat0 = null;
+  var lng0 = null;
+  for (var i=0; i < activity.snapshots.length; i++) {
+    lat = activity.snapshots[i].latitude;
+    lng = activity.snapshots[i].longitude;
+    if (lat0 !== null && lng0 !== null) {
+      result.distance += sphereDist(lat0, lng0, lat, lng);
+    }
+    lat0 = lat;
+    lng0 = lng;
+    result.burned += calPerOne[activityType]*activity.snapshots[i].speed;
+    result.uvTotal += activity.snapshots[i].uvLevel;
+  }
+  return result;
+}
+
+function summarizeActivities(activities) {
+  var numAct = activities.length;
+  var result = {
+    numAct: numAct,
+    avgDist: 0,
+    avgBurned: 0,
+    avgUvTotal: 0
+  }
+  for (var i = 0; i < numAct; i++) {
+    resultOne = reduceActivity(activities[0]);
+    result.avgDist += resultOne.distance;
+    result.avgBurned += resultOne.burned;
+    result.avgUvTotal += resultOne.uvTotal;
+  }
+  result.avgDist /= numAct;
+  result.avgBurned /= numAct;
+  result.avgUvTotal /= numAct;
+  return result;
+}
+
+function weekAgo(){
+  var dateNow = new Date();
+  return new Date(dateNow.getTime() - 1000*60*60*24*7);
+}
+
+router.get('/summary/:sumType', function(req, res, next) {
+   responseJson = {success: false, message: ""};
+   if (!req.headers["x-auth"]) {
+      responseJson.success = false;
+      responseJson.message = "No authentication token.";
+      return res.status(401).json(responseJson);
+   }
+
+   var authToken = req.headers["x-auth"];
+
+   try {
+      var decodedToken = jwt.decode(authToken, secret);
+
+      var sumType = req.params.sumType;
+      var dateNow = new Date();
+
+      if (sumType === "all") {
+        var query = {"startDate": {"$gte": weekAgo()}};
+        Activity.find(query, function(err, activities) {
+          if(err) {
+            responseJson.success = false;
+            responseJson.message = "Error communicating with database.";
+            return res.status(400).json(responseJson);
+          }
+          else if (activities.length == 0) {
+            responseJson.success = true;
+            responseJson.message = {numAct:0,avgDist:0,avgBurned:0,avgUvTotal:0};
+            return res.status(400).json(responseJson);
+          }
+          result = summarizeActivities(activities);
+          responseJson.success = true;
+          responseJson.message = result;
+          return res.status(200).json(responseJson);
+        });
+        return;
+      }
+      else if (sumType === "near") {
+        User.findOne({email: decodedToken.email}, function(err, user) {
+          if(err) {
+            responseJson.success = false;
+            responseJson.message = "Error communicating with database.";
+            return res.status(400).json(responseJson);
+          }
+          else if(!user) {
+            responseJson.success = false;
+            responseJson.message = "Unable to find user.";
+            return res.status(400).json(responseJson);
+          }
+
+          var query = {
+            startDate: {"$gte": weekAgo()},
+            startLoc: {
+              "$near": {
+                "$maxDistance": 10000,
+                "$geometry": user.userLoc
+              }
+            }
+          };
+          Activity.find(query, function(err, activities) {
+            if(err) {
+              responseJson.success = false;
+              responseJson.message = "Error communicating with database.";
+              return res.status(400).json(responseJson);
+            }
+            else if (activities.length == 0) {
+              responseJson.success = true;
+              responseJson.message = {numAct:0,avgDist:0,avgBurned:0,avgUvTotal:0};
+              return res.status(200).json(responseJson);
+            }
+            result = summarizeActivities(activities);
+            responseJson.success = true;
+            responseJson.message = result;
+            return res.status(200).json(responseJson);
+          });
+          return;
+        });
+        return;
+      }
+      else if (sumType === "my") {
+         var query = {"startDate": {"$gte": weekAgo()},
+           "userEmail": decodedToken.email
+         };
+      }
+      else {
+         responseJson.success = false;
+         responseJson.message = "Invalid API request.";
+         return res.status(400).json(responseJson);
+      }
+   }
+   catch (ex) {
+      return res.status(401).json({success: false, message: "Invalid authentication token."});
+   }
+
 });
 
 module.exports = router;
