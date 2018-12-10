@@ -14,18 +14,19 @@ function updateEmail() {
 
     $.ajax({
         url: '/updateinfo/email',
-        type: 'POST',
-        //contentType: "application/json",
+        type: 'PUT',
+        contentType: "application/json",
         headers: { 'x-auth': window.localStorage.getItem("authToken") },
-        data: { newEmail: $newEmail },
+        data: JSON.stringify({ newEmail: $newEmail }),
         responseType: 'json',
         success: function (data, textStatus, jqXHR) {
 
            hideUpdateEmailForm();
+           $("#email").html($newEmail);
            $("#error").before("<div id='test1'>"+ data["message"]+"</div>");
            $("#test1").fadeOut(5000);
            window.localStorage.removeItem("authToken");
-          window.localStorage.setItem("authToken", data.token);
+           window.localStorage.setItem("authToken", data.token);
            //window.location = "index.html";
            console.log(data);
         },
@@ -55,10 +56,10 @@ function updateName() {
 
     $.ajax({
         url: '/updateinfo/name',
-        type: 'POST',
-//        contentType: "application/json",
+        type: 'PUT',
+        contentType: "application/json",
         headers: { 'x-auth': window.localStorage.getItem("authToken") },
-        data: { newName: $newName },
+        data: JSON.stringify({ newName: $newName }),
         responseType: 'json',
         success: function (data, textStatus, jqXHR) {
 
@@ -103,16 +104,16 @@ function updatePassword() {
 
     $.ajax({
         url: '/updateinfo/password',
-        type: 'POST',
-//        contentType: "application/json",
+        type: 'PUT',
+        contentType: "application/json",
         headers: { 'x-auth': window.localStorage.getItem("authToken") },
-        data: { newPassword: $newPassW },
+        data: JSON.stringify({ newPassword: $newPassW }),
         responseType: 'json',
         success: function (data, textStatus, jqXHR) {
 
           hideUpdatePassWForm();
-//          $("#error").before("<div id='test1'>"+ data["message"]+"</div>");
-//          $("#test1").fadeOut(5000);
+          $("#error").before("<div id='test1'>"+ data["message"]+"</div>");
+          $("#test1").fadeOut(5000);
 
 //          console.log(data);
         },
@@ -147,6 +148,8 @@ function updateLocation() {
       responseType: 'json',
       success: function (data, textStatus, jqXHR) {
         hideUpdateLocationForm();
+        $("#error").before("<div id='test1'>"+ data["message"]+"</div>");
+        $("#test1").fadeOut(5000);
         $("#location").html(newLocation);
       },
       error: function(jqXHR, textStatus, errorThrown) {

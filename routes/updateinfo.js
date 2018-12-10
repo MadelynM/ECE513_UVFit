@@ -28,24 +28,24 @@ function authenticateAuthToken(req) {
     }
 }
 
-router.post("/email", function(req, res) {
+router.put("/email", function(req, res) {
 
   var responseJson = {
         success: false,
         message: ""
     };
-    var stat2={};
-    var stat3={};
+  var stat2={};
+  var stat3={};
 
-var dtoken = authenticateAuthToken(req);
-if (dtoken==null){
-  responseJson.message = "Authentication failed";
-  return res.status(401).json(responseJson);
-}
-      if (!dtoken){
-         responseJson.message = "Authentication failed";
-         return res.status(401).json(responseJson);
-      }
+  var dtoken = authenticateAuthToken(req);
+  if (dtoken==null){
+    responseJson.message = "Authentication failed";
+    return res.status(401).json(responseJson);
+  }
+  if (!dtoken){
+    responseJson.message = "Authentication failed";
+    return res.status(401).json(responseJson);
+  }
 
 
 
@@ -57,7 +57,7 @@ if (dtoken==null){
             else {
 
 
-   Device.update({userEmail: dtoken.email },
+  Device.update({userEmail: dtoken.email },
       { userEmail: req.body.newEmail },
       { multi: true },
       function(err, sta2) {
@@ -114,27 +114,27 @@ if (dtoken==null){
         });
      });
 
-router.post("/name", function(req, res) {
+router.put("/name", function(req, res) {
 
-       var responseJson = {
+      var responseJson = {
              success: false,
              message: ""
          };
       var dtoken = authenticateAuthToken(req);
-        if (dtoken==null){
-           responseJson.message = "Authentication failed";
-           return res.status(401).json(responseJson);
-       }
-        if (!dtoken){
-            responseJson.message = "Authentication failed";
-            return res.status(401).json(responseJson);
-       }
+      if (dtoken==null){
+         responseJson.message = "Authentication failed";
+         return res.status(401).json(responseJson);
+      }
+      if (!dtoken){
+          responseJson.message = "Authentication failed";
+          return res.status(401).json(responseJson);
+      }
 
-       User.update({email: dtoken.email },
-          { fullName: req.body.newName },
-          { multi: false },
-          function(err, sta) {
-            if (err){
+      User.update({email: dtoken.email },
+        { fullName: req.body.newName },
+        { multi: false },
+        function(err, sta) {
+          if (err){
                res.status(401).json({success : false, message : "Error communicating with database."});
                return;
             }
@@ -151,7 +151,7 @@ router.post("/name", function(req, res) {
 
 });
 
-router.post("/password", function(req, res) {
+router.put("/password", function(req, res) {
 
        var responseJson = {
              success: false,
@@ -170,7 +170,7 @@ router.post("/password", function(req, res) {
        bcrypt.hash(req.body.newPassword, null, null, function(err, hash) {
             //  var passwordHash = hash; // hashed password
 
-       User.update({email: dtoken.email },
+         User.update({email: dtoken.email },
           { passwordHash: hash },//FEXME
           { multi: false },
           function(err, sta) {

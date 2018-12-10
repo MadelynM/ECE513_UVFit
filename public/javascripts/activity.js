@@ -12,9 +12,9 @@ function reduceActivity(activity) {
   // Number of calories burned in 1s per activity at given speed
   // Given values are meaningless nonsense
   var calPerOne = {
-    walking: 5,
-    running: 10,
-    swimming: 12
+    walking: 0.031966,
+    running: 0.031966,
+    biking: 0.016942
   };
 
   var result = {
