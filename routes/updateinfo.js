@@ -192,7 +192,64 @@ router.post("/password", function(req, res) {
 
 });
 
-
-
+router.put('/location', function(req, res, next) {
+  var responseJson = {success: false, message: ""};
+  if (!req.headers["x-auth"]) {
+    responseJson.success = false;
+    responseJson.message = "No authentication token";
+    return res.status(401).json(responseJson);
+  }
+  authToken = req.headers["x-auth"];
+  if (!req.body.newLocation) {
+    responseJson.success = false;
+    responseJson.message = "Invalid request";
+    return res.status(400).json(responseJson);
+  }
+  try {
+    var decodedToken = jwt.decode(authToken, secret);
+    var newLocation = req.body.newLocation;
+    var locationRe = /^(-?[0-9]+\.?[0-9]*),\s*(-?[0-9]+\.?[0-9]*)$/;
+    var locationArray = newLocation.match(locationRe);
+    if(!locationArray) {
+      responseJson.success = false;
+      responseJson.message = "Invalid location.";
+      return res.status(400).json(responseJson);
+    }
+    latitude = parseFloat(locationArray[1]);
+    longitude = parseFloat(locationArray[2]);
+    if (latitude > 90 || latitude < -90 || longitude > 180 || longitude < -180) {
+      responseJson.success = false;
+      responseJson.message = "Invalid location: -90 <= latitude <= 90, 180 <= longitude <= 180";
+      return res.status(400).json(responseJson);
+    }
+    var query = {"email": decodedToken.email};
+    User.update({email: decodedToken.email},
+      {userLoc: {type: "Point", coordinates: [longitude, latitude]}},
+      {multi: false},
+      function(err, sta) {
+        if(err) {
+          responseJson.success = false;
+          responseJson.message = "Error updating location.";
+          return res.status(400).json(responseJson);
+        }
+        else if(!sta) {
+          responseJson.success = false;
+          responseJson.message = "Error looking up user";
+          return res.status(400).json(responseJson);
+        }
+        else {
+          responseJson.success = true;
+          responseJson.message = "Location successfully updated";
+          return res.status(200).json(responseJson);
+        }
+      }
+    );
+  }
+  catch(ex) {
+    responseJson.success = false;
+    responseJson.message = ex.message;//"Invalid authentication token.";
+    return res.status(401).json(responseJson);
+  }
+});
 
 module.exports = router;
