@@ -29,11 +29,11 @@ function sphereDist(lat1,lon1,lat2,lon2) {
 
 function reduceActivity(activity) {
   // Number of calories burned in 1s per activity at given speed
-  // Given values are meaningless nonsense
+  // Given values are for speeds in mph
   var calPerOne = {
-    walking: 0.031966,
-    running: 0.031966,
-    biking: 0.016942
+    walking: 100/(60*60),
+    running: 100/(60*60),
+    biking: 50/(60*60)
   };
 
   var result = {

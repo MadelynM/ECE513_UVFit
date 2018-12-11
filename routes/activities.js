@@ -13,7 +13,7 @@ var secret = "supersecretserverpassword";
 
 router.post('/new', function(req, res, next) {
    var responseJson = {success: true, message: ""};
-   if (!req.body.date || !req.body.activityId || !req.body.latitude ||
+   if (!req.body.activityId || !req.body.latitude ||
        !req.body.longitude || !req.body.uvLevel || !req.body.speed) {
       responseJson.success = false;
       responseJson.message = "Invalid request";
@@ -32,7 +32,11 @@ router.post('/new', function(req, res, next) {
             return res.status(401).json(responseJson);
          }
          else {
-            var snapshot = {date: new Date(parseInt(req.body.date)),
+            var date = new Date();
+            if(req.body.date) {
+              date = Date(parseInt(req.body.date));
+            }
+            var snapshot = {date: date,
                latitude: req.body.latitude,
                longitude: req.body.longitude,
                speed: req.body.speed,
@@ -48,8 +52,8 @@ router.post('/new', function(req, res, next) {
                   var newActivity = new Activity({
                      userEmail: device.userEmail,
                      activityId: req.body.activityId,
-                     startDate: req.body.date,
-                     endDate: req.body.date,
+                     startDate: date,
+                     endDate: date,
                      startLoc: {
                         type: "Point",
                         coordinates: [req.body.longitude, req.body.latitude]
@@ -212,10 +216,11 @@ function reduceActivity(activity) {
   // Number of calories burned in 1s per activity at given speed
   // Given values are kind of okay
   var calPerOne = {
-    walking: 0.031966,
-    running: 0.031966,
-    biking: 0.016942
+    walking: 100/(60*60),
+    running: 100/(60*60),
+    biking: 50/(60*60)
   };
+
 
   var result = {
     duration: 0,
