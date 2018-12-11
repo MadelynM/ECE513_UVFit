@@ -13,8 +13,10 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
   console.log(data);
    $("#email").html(data.email);
    $("#fullName").html(data.fullName);
-   var location = data.userLoc.coordinates[1] + ", ";
-   location += data.userLoc.coordinates[0];
+   var location = "";
+   if(data.userLoc.coordinates) {
+     location += data.userLoc.coordinates[1] + ", " + data.userLoc.coordinates[0];
+   }
    $("#location").html(location);
    $("#lastAccess").html(data.lastAccess);
    $("#main").show();
