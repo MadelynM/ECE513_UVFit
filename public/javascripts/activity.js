@@ -100,10 +100,10 @@ function myWeeklySummarySuccess(data, textStatus, jqXHR) {
     }
     responseHTML += "<div class=\"col s12 m6\">";
     responseHTML += "<ul class='collection'>";
-    responseHTML += "<li class='collection-item'>Activity Duration (s): " + Math.round(activityDuration/1000.0) + "</li>";
-    responseHTML += "<li class='collection-item'>Calories Burned: " + (caloriesBurned) + "</li>";
-    responseHTML += "<li class='collection-item'>Total UV Exposure: " + uvTotal + "</li>";
-    responseHTML += "<li class='collection-item'>Total Distance: " + distTotal + "</li>";
+    responseHTML += "<li class='collection-item'>Activity Duration: " + Math.round(activityDuration/60000.0) + "m" + (Math.round(activityDuration/1000)%60) + "s" + "</li>";
+    responseHTML += "<li class='collection-item'>Calories Burned: " + caloriesBurned.toFixed(2) + "</li>";
+    responseHTML += "<li class='collection-item'>Total UV Exposure: " + uvTotal.toFixed(2) + "</li>";
+    responseHTML += "<li class='collection-item'>Total Distance: " + distTotal.toFixed(2) + "km" + "</li>";
     responseHTML += "</ul>";
     responseHTML += "</div>";
   }
@@ -170,9 +170,9 @@ function myActivitySummarySuccess(data, textStatus, jqXHR) {
       resHTML += "</select><label>Type of Activity</label>";
       resHTML += "</li>";
       result = reduceActivity(curActivity);
-      resHTML += "<li class=\"collection-item\">Activity duration (s): " + Math.round(result.duration/1000.0) + "</li>";
-      resHTML += "<li class=\"collection-item\">Calories burned: " + Math.round(result.burned) + "</li>";
-      resHTML += "<li class=\"collection-item\">UV Exposure: " + Math.round(result.uvTotal) + "</li>";
+      resHTML += "<li class=\"collection-item\">Activity duration (s): " + Math.round(result.duration/60000.0) + "m" + (Math.round(result.duration/1000)%60) + "s" + "</li>";
+      resHTML += "<li class=\"collection-item\">Calories burned: " + result.burned.toFixed(2) + "</li>";
+      resHTML += "<li class=\"collection-item\">UV Exposure: " + result.uvTotal.toFixed(2) + "</li>";
       resHTML += "</ul>";
     }
     resHTML += "</div></div>";
@@ -203,9 +203,9 @@ function nearWeeklySummarySuccess(data, textStatus, jqXHR) {
   else {
     responseHTML += "<div class='col s12 m6'><ul class='collection'>";
     responseHTML += "<li class='collection-item'>Number of activities: " + data.message.numAct + "</li>";
-    responseHTML += "<li class='collection-item'>Average total distance: " + data.message.avgDist + "</li>";
-    responseHTML += "<li class='collection-item'>Average total calories burned: " + data.message.avgBurned + "</li>";
-    responseHTML += "<li class='collection-item'>Average UV exposure: " + data.message.avgUvTotal + "</li>";
+    responseHTML += "<li class='collection-item'>Average total distance: " + data.message.avgDist.toFixed(2) + "km" + "</li>";
+    responseHTML += "<li class='collection-item'>Average total calories burned: " + data.message.avgBurned.toFixed(2) + "</li>";
+    responseHTML += "<li class='collection-item'>Average UV exposure: " + data.message.avgUvTotal.toFixed(2) + "</li>";
     responseHTML += "</ul></div>";
   }
   $("#nearSummaryRes").html(responseHTML);
@@ -230,9 +230,9 @@ function allWeeklySummarySuccess(data, textStatus, jqXHR) {
   else {
     responseHTML += "<div class='col s12 m6'><ul class='collection'>";
     responseHTML += "<li class='collection-item'>Number of activities: " + data.message.numAct + "</li>";
-    responseHTML += "<li class='collection-item'>Average total distance: " + data.message.avgDist + "</li>";
-    responseHTML += "<li class='collection-item'>Average total calories burned: " + data.message.avgBurned + "</li>";
-    responseHTML += "<li class='collection-item'>Average UV exposure: " + data.message.avgUvTotal + "</li>";
+    responseHTML += "<li class='collection-item'>Average total distance: " + data.message.avgDist.toFixed(2) + "km</li>";
+    responseHTML += "<li class='collection-item'>Average total calories burned: " + data.message.avgBurned.toFixed(2) + "</li>";
+    responseHTML += "<li class='collection-item'>Average UV exposure: " + data.message.avgUvTotal.toFixed(2) + "</li>";
     responseHTML += "</ul></div>";
   }
   $("#allSummaryRes").html(responseHTML);

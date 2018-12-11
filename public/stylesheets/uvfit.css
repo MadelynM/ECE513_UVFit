@@ -48,6 +48,11 @@ main {
   flex: 1 0 auto;
 }
 
+.tabs {
+  flex-flow: row wrap;
+  height: 100%;
+}
+
 .tabs .tab a{
   color:#000;
 }
