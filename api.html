@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+	 <title>UVFit - API calls</title>
+
+	 <!-- Import Google Icon Font -->
+	 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	 <!-- Import materialize.css -->
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" media="screen,projection">
+	 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
+	 <link href="stylesheets/uvfit.css" rel="stylesheet">
+
+	 <!-- Let browser know website is optimized for mobile -->
+	 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+
+<body>
+  <main>
+	<!-- Dropdown Structure -->
+	<ul id="dropdown1" class="dropdown-content">
+		<li><a href="home.html">Home</a></li>
+		<li><a href="activity.html">Activity</a></li>
+<li><a href="forecast.html">Weather and UV forecast</a></li>
+		<li><a href="#!" id="signout">Sign out</a></li>
+	</ul>
+	<nav>
+		<div class="nav-wrapper blue-grey darken-2">
+			<a href="home.html" class="brand-logo left"><img id="logo" src="images/uvlogo.png"><span id="name">UVFit</span></a>
+			<ul class="right ">
+				<!-- Dropdown Trigger -->
+				<li><a class="dropdown-button" href="#!" data-activates="dropdown1"><i class="material-icons">more_vert</i></a></li>
+			</ul>
+		</div>
+	</nav>
+
+	<div class="row" id="main">
+        Each Activity takes the form <br>
+        <code>
+        {<br>
+         &nbsp;"activityId": Number,<br>
+         &nbsp;"activityType:" String,<br>
+         &nbsp;"endDate": Date,<br>
+         &nbsp;"snapshots": [Snapshot],<br>
+         &nbsp;"startDate": Date,<br>
+         &nbsp;"startLoc": {type: "Point", coordinates: [Number]},<br>
+         &nbsp;"userEmail": Email<br>
+        }<br>
+        </code>
+        Each Snapshot takes the form<br>
+        <code>
+        {<br>
+        &nbsp;"date": Date,<br>
+         &nbsp;"latitude": Number,<br>
+         &nbsp;"longitude": Number,<br>
+         &nbsp;"speed": Number,<br>
+         &nbsp;"uvLevel": Number<br>
+        }<br>
+        </code>
+        <table>
+            <tr>
+                <th> Endpoint </th>
+                <th> HTML method </th>
+                <th> Authentication type </th>
+                <th> Request format </th>
+                <th> Response format </th>
+                <th> Description <th>
+            </tr>
+            <tr>
+                <td> /activities/new </td>
+                <td> POST </td>
+                <td> API KEY </td>
+                <td> <code>
+                    {<br>
+                    &nbsp;"apikey": Apikey, <br>
+                    &nbsp;"activityId": Number, <br>
+                    &nbsp;"latitude": Number,<br>
+                    &nbsp;"longitude": Number,<br>
+                    &nbsp;"uvLevel": Number,<br>
+                    &nbsp;"speed": Number,<br>
+                    &nbsp;"date": Date<br>
+                    } </code></td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"success": true, <br>
+                    &nbsp;"message": "Activity with ID 'activityId' was saved"<br>
+                    } </code><br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Post new activity data. </td>
+            </tr>
+            <tr>
+                <td> /activities/retrieve/all </td>
+                <td> GET </td>
+                <td> x-auth </td>
+                <td> N/A </td>
+                <td> 
+                    <code> {"success": true, "activities": [Activity]} </code><br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Retrieve all of a user's activity data. </td>
+            </tr>
+            <tr>
+                <td> /activities/retrieve/:activityId </td>
+                <td> GET </td>
+                <td> x-auth </td>
+                <td> N/A </td>
+                <td> 
+                    <code> {"success": true, "activities": [Activity]} </code><br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Retrieve a single activity's data. </td>
+            </tr>
+            <tr>
+                <td> /activities/update/type </td>
+                <td> PUT </td>
+                <td> x-auth </td>
+                <td> <code>
+                    {<br>
+                    &nbsp;"activityId": Number, <br>
+                    &nbsp;"activityType": String,<br>
+                    } </code></td>
+                <td>
+                    <code> {"success": true, "message": "Activity with ID 'activityId' was updated"} </code><br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Update the type of activity for a single activity. </td>
+            </tr>
+            <tr>
+                <td> /activities/summary/all </td>
+                <td> GET </td>
+                <td> x-auth </td>
+                <td> N/A </td>
+                <td> 
+                    <code> {<br>
+                    &nbsp;"success": true,<br>
+                    &nbsp;"message": {<br>
+                    &nbsp;&nbsp;"avgBurned": Number,<br>
+                    &nbsp;&nbsp;"avgDist": Number,<br>
+                    &nbsp;&nbsp;"avgUvTotal": Number,<br>
+                    &nbsp;&nbsp;"numAct": Number<br>
+                    &nbsp;}<br>
+                    } </code><br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Retrieve a summary of all user data from within the past week. </td>
+            </tr>
+            <tr>
+                <td> /activities/summary/near </td>
+                <td> GET </td>
+                <td> x-auth </td>
+                <td> N/A </td>
+                <td> 
+                    <code> {<br>
+                    &nbsp;"success": true,<br>
+                    &nbsp;"message": {<br>
+                    &nbsp;&nbsp;"avgBurned": Number,<br>
+                    &nbsp;&nbsp;"avgDist": Number,<br>
+                    &nbsp;&nbsp;"avgUvTotal": Number,<br>
+                    &nbsp;&nbsp;"numAct": Number<br>
+                    &nbsp;}<br>
+                    } </code><br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Retrieve a summary of all user data within 10km of user's location from within the past week. </td>
+            </tr>
+            <tr>
+                <td> /updateinfo/email </td>
+                <td> PUT </td>
+                <td> x-auth </td>
+                <td> <code>
+                    {<br>
+                    &nbsp;"newEmail": Email, <br>
+                    } </code></td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"success": true, <br>
+                    &nbsp;"message": "Your email has been updated."<br>
+                    } </code><br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Update a user's email address. </td>
+            </tr>
+            <tr>
+                <td> /updateinfo/name </td>
+                <td> PUT </td>
+                <td> x-auth </td>
+                <td> <code>
+                    {<br>
+                    &nbsp;"newName": String, <br>
+                    } </code></td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"success": true, <br>
+                    &nbsp;"message": "Your name has been updated."<br>
+                    } </code><br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Update a user's full name. </td>
+            </tr>
+            <tr>
+                <td> /updateinfo/password </td>
+                <td> PUT </td>
+                <td> x-auth </td>
+                <td> <code>
+                    {<br>
+                    &nbsp;"newPassword": String, <br>
+                    } </code></td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"success": true, <br>
+                    &nbsp;"message": "Your password has been updated."<br>
+                    } </code><br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Update a user's password. </td>
+            </tr>
+            <tr>
+                <td> /updateinfo/location </td>
+                <td> PUT </td>
+                <td> x-auth </td>
+                <td> <code>
+                    {<br>
+                    &nbsp;"newLocation": [Number], <br>
+                    } </code></td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"success": true, <br>
+                    &nbsp;"message": "Your location has been updated."<br>
+                    } </code><br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Update a user's location. </td>
+            </tr>
+            <tr>
+                <td> /devices/status/:devid </td>
+                <td> GET </td>
+                <td> None </td>
+                <td> N/A</td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"devices": [<br>
+                    &nbsp;&nbsp;{<br>
+                    &nbsp;&nbsp;&nbsp;"deviceId": String,<br>
+                    &nbsp;&nbsp;&nbsp;"lastContact: Date<br>
+                    &nbsp;&nbsp;}<br>
+                    &nbsp;] <br>
+                    } </code><br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Retrieve a device's last contact if devid is a device id. Retrieve all devices last contact if devid is all. </td>
+            </tr>
+            <tr>
+                <td> /devices/register </td>
+                <td> POST </td>
+                <td> x-auth </td>
+                <td> 
+                    <code> {<br>
+                    &nbsp;"deviceId": String <br>
+                    } </code><br></td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"registered": true, <br>
+                    &nbsp;"apikey": String,<br>
+                    &nbsp;"message": "Device ID #### was registered",<br>
+                    } </code> <br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"registered": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Register a device ID and obtain an API key. </td>
+            </tr>
+            <tr>
+                <td> /devices/replace </td>
+                <td> PUT </td>
+                <td> x-auth </td>
+                <td> 
+                    <code> {<br>
+                    &nbsp;"deviceOld": String,<br>
+                    &nbsp;"deviceNew": String <br>
+                    } </code><br></td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"replaced": true, <br>
+                    &nbsp;"apikey": String,<br>
+                    &nbsp;"message": "Device ID #### has been replaced with a new device",<br>
+                    } </code> <br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"replaced": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Replace a device ID with another ID and obtain an API key. </td>
+            </tr>
+            <tr>
+                <td> /users/signin </td>
+                <td> POST </td>
+                <td> none </td>
+                <td> 
+                    <code> {<br>
+                    &nbsp;"email": String,<br>
+                    &nbsp;"password": String <br>
+                    } </code><br></td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"success": true, <br>
+                    &nbsp;"token": x-auth token,<br>
+                    } </code> <br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Sign in user and obtain an x-auth token. </td>
+            </tr>
+            <tr>
+                <td> /users/register </td>
+                <td> POST </td>
+                <td> none </td>
+                <td> 
+                    <code> {<br>
+                    &nbsp;"email": String,<br>
+                    &nbsp;"password": String <br>
+                    &nbsp;"fullName": String <br>
+                    } </code><br></td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"success": true, <br>
+                    &nbsp;"message": "NAME your account has been created! Please check your email for activation link."<br>
+                    } </code> <br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Register user. </td>
+            </tr>
+            <tr>
+                <td> /users/account </td>
+                <td> GET </td>
+                <td> x-auth </td>
+                <td> N/A </td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"success": true,<br>
+                    &nbsp;"email": String,<br>
+                    &nbsp;"fullName": String,<br>
+                    &nbsp;"lastAccess": Date,<br>
+                    &nbsp;"userLoc": {type: "Point", coordinates: [Number]},<br>
+                    &nbsp;"devices": [{"deviceId": String, "apikey": String}]<br>
+                    } </code> <br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Get user's account data. </td>
+            </tr>
+            <tr>
+                <td> /users/activate/:token </td>
+                <td> GET </td>
+                <td> x-auth </td>
+                <td> N/A </td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"success": true,<br>
+                    &nbsp;"message": "Your account has been activated!"<br>
+                    } </code> <br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Activate a user using the emailed :token. </td>
+            </tr>
+            <tr>
+                <td> /usersetting/setting </td>
+                <td> POST </td>
+                <td> x-auth </td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"deviceId": String,<br>
+                    &nbsp;"activity": String,<br>
+                    &nbsp;"uvThresh": Number,<br>
+                    } </code> <br>
+
+                </td>
+                <td>
+                    <code> {<br>
+                    &nbsp;"success": true,<br>
+                    &nbsp;"message": "Settings are posted DEVICE THRESHOLD ACTIVITY."<br>
+                    } </code> <br>
+                    Or <br>
+                    <code> {<br>
+                    &nbsp;"success": false, <br>
+                    &nbsp;"message": "descriptive error message"<br>
+                    } </code>
+                </td>
+                <td> Set the device threshold and activity type on the remote device. </td>
+            </tr>
+            </table>
+	</div>
+</main>
+  </body>
+
+  <footer class="page-footer blue-grey darken-2">
+     <div class="container">
+       <div class="row">
+         <div class="col l6 s12">
+           <h5 class="white-text">UVFit Project</h5>
+           <p class="grey-text text-lighten-4">Copyright 2018
+           </p>
+         </div>
+         <div class="col l4 offset-l2 s12">
+           <h5 class="white-text">Links</h5>
+           <ul>
+             <li><a class="grey-text text-lighten-3" href="https://www.google.com/" target="_blank">Google</a></li>
+           </ul>
+         </div>
+       </div>
+     </div>
+     <div class="footer-copyright">
+       <div class="container">
+       © 2018 Copyright
+       </div>
+     </div>
+   </footer>
+
+  <!-- Initialize dropdown menu in materialize -->
+  <script>
+    $(document).ready(function() {
+		$(".dropdown-button").dropdown();
+	 })
+  </script>
+
+</html>
