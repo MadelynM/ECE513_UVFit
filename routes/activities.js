@@ -263,7 +263,7 @@ function summarizeActivities(activities) {
     avgUvTotal: 0
   }
   for (var i = 0; i < numAct; i++) {
-    resultOne = reduceActivity(activities[0]);
+    resultOne = reduceActivity(activities[i]);
     result.avgDist += resultOne.distance;
     result.avgBurned += resultOne.burned;
     result.avgUvTotal += resultOne.uvTotal;
